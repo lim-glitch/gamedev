@@ -3,9 +3,11 @@ using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour
 {
-    public int maxHealth = 3;
-    private int currentHealth;
+    public float maxHealth = 3f;
+    private float currentHealth;
+
     private bool isInvincible;
+
     private Rigidbody2D rb;
     private SpriteRenderer sr;
     private Vector3 respawnPoint;
@@ -13,8 +15,10 @@ public class PlayerHealth : MonoBehaviour
     void Start()
     {
         currentHealth = maxHealth;
+
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
+
         respawnPoint = transform.position;
     }
 
@@ -22,15 +26,28 @@ public class PlayerHealth : MonoBehaviour
     {
         if (transform.position.y < -5f && !isInvincible)
         {
-            TakeDamage();
+            TakeDamage(1f);
         }
     }
 
-    public void TakeDamage()
+    public void TakeDamage(float damage)
     {
         if (isInvincible) return;
 
-        currentHealth--;
+        PlayerMovement movement = GetComponent<PlayerMovement>();
+
+        if (
+            movement != null &&
+            movement.avatarType == PlayerMovement.AvatarType.Solid &&
+            movement.tankMode
+        )
+        {
+            damage *= movement.damageReduction;
+        }
+
+        currentHealth -= damage;
+
+        Debug.Log("Player took " + damage + " damage. Current health: " + currentHealth);
 
         if (currentHealth > 0)
         {
@@ -41,6 +58,11 @@ public class PlayerHealth : MonoBehaviour
         {
             GameOver();
         }
+    }
+
+    public void TakeDamage()
+    {
+        TakeDamage(1f);
     }
 
     void Respawn()
@@ -58,16 +80,21 @@ public class PlayerHealth : MonoBehaviour
     IEnumerator Invincibility()
     {
         isInvincible = true;
+
         float duration = 1f;
         float timer = 0f;
+
         while (timer < duration)
         {
             sr.enabled = false;
             yield return new WaitForSeconds(0.1f);
+
             sr.enabled = true;
             yield return new WaitForSeconds(0.1f);
+
             timer += 0.2f;
         }
+
         isInvincible = false;
     }
 }

@@ -24,7 +24,6 @@ public class PlayerMovement : MonoBehaviour
 
     private Rigidbody2D rb;
     private Camera mainCamera;
-
     private float moveInput;
 
     private bool isGrounded;
@@ -32,6 +31,25 @@ public class PlayerMovement : MonoBehaviour
     private bool canWallJump;
     private bool wasGrounded;
 
+    [Header("Power Up")]
+    public bool poweredUp;
+    private Coroutine powerRoutine;
+
+    [Header("Gas")]
+    public bool gasDispersing;
+    public float gasCooldown = 10f;
+    public bool gasOnCooldown;
+    public float gasCooldownTimer;
+
+    [Header("Liquid")]
+    public bool surfaceMovementEnabled;
+    public float dashCharge;
+    public float maxDashCharge = 3f;
+
+    [Header("Solid")]
+    public bool tankMode;
+    public float damageReduction = 0.5f;
+    public int damageMultiplier = 2;
     private float moveSpeed;
     private float jumpForce;
 
@@ -133,6 +151,26 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    public void ActivatePower(float duration)
+    {
+        if (powerRoutine != null)
+        {
+            StopCoroutine(powerRoutine);
+        }
+
+        powerRoutine =
+            StartCoroutine(PowerRoutine(duration));
+    }
+
+    IEnumerator PowerRoutine(float duration)
+    {
+        poweredUp = true;
+
+        yield return new WaitForSeconds(duration);
+
+        poweredUp = false;
+    }
+
     void HandleSpecialAbilities()
     {
         if (avatarType == AvatarType.Gas)
@@ -144,28 +182,121 @@ public class PlayerMovement : MonoBehaviour
                     -2f
                 );
             }
+
+            if (poweredUp && Input.GetKeyDown(KeyCode.Q) && !gasOnCooldown)
+            {
+                StartCoroutine(GasDisperse());
+            }
         }
 
-        if (
-            avatarType == AvatarType.Liquid &&
-            isTouchingWall &&
-            !isGrounded &&
-            rb.linearVelocity.y < 0
-        )
+        if (avatarType == AvatarType.Liquid)
         {
-            rb.linearVelocity = new Vector2(
-                rb.linearVelocity.x,
-                -1.5f
-            );
+            // Existing wall slide
+            if (
+                isTouchingWall &&
+                !isGrounded &&
+                rb.linearVelocity.y < 0
+            )
+            {
+                rb.linearVelocity = new Vector2(
+                    rb.linearVelocity.x,
+                    -1.5f
+                );
+            }
+
+            // Powered surface movement
+            if (poweredUp)
+            {
+                rb.gravityScale = 0.2f;
+            }
+            else
+            {
+                rb.gravityScale = 1f;
+            }
+
+            // Charged dash
+            if (poweredUp)
+            {
+                if (Input.GetKey(KeyCode.LeftShift))
+                {
+                    dashCharge += Time.deltaTime;
+
+                    dashCharge =
+                        Mathf.Clamp(
+                            dashCharge,
+                            0,
+                            maxDashCharge
+                        );
+                }
+
+                if (Input.GetKeyUp(KeyCode.LeftShift))
+                {
+                    float dashForce =
+                        dashCharge * 12f;
+
+                    rb.linearVelocity =
+                        new Vector2(
+                            transform.localScale.x * dashForce,
+                            rb.linearVelocity.y
+                        );
+
+                    dashCharge = 0;
+                }
+            }
         }
 
-        if (
-            avatarType == AvatarType.Solid &&
-            isGrounded &&
-            !wasGrounded
-        )
+        if (avatarType == AvatarType.Solid)
         {
-            StartCoroutine(ShakeCamera());
+            if (poweredUp)
+            {
+                tankMode = true;
+                moveSpeed = 2.5f;
+            }
+            else
+            {
+                tankMode = false;
+                moveSpeed = 4f;
+            }
+
+            if (isGrounded && !wasGrounded)
+            {
+                StartCoroutine(ShakeCamera());
+            }
+        }
+
+        IEnumerator GasDisperse()
+        {
+            gasOnCooldown = true;
+            gasDispersing = true;
+
+            Collider2D col = GetComponent<Collider2D>();
+            SpriteRenderer sr = GetComponent<SpriteRenderer>();
+
+            col.enabled = false;
+
+            Color c = sr.color;
+            c.a = 0.4f;
+            sr.color = c;
+
+            yield return new WaitForSeconds(3f);
+
+            col.enabled = true;
+
+            c.a = 1f;
+            sr.color = c;
+
+            gasDispersing = false;
+
+            gasCooldownTimer = gasCooldown;
+
+            while (gasCooldownTimer > 0f)
+            {
+                gasCooldownTimer -= Time.deltaTime;
+                yield return null;
+            }
+
+            gasCooldownTimer = 0f;
+            gasOnCooldown = false;
         }
     }
 

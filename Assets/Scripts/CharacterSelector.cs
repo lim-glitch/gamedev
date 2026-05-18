@@ -3,12 +3,10 @@ using UnityEngine;
 public class CharacterSelector : MonoBehaviour
 {
     public GameObject gasPlayer;
-
     public GameObject liquidPlayer;
-
     public GameObject solidPlayer;
 
-    private GameObject currentPlayer;
+    public GameObject currentPlayer;
 
     void Start()
     {
@@ -39,9 +37,7 @@ public class CharacterSelector : MonoBehaviour
 
         if (currentPlayer != null)
         {
-            spawnPosition =
-                currentPlayer.transform.position;
-
+            spawnPosition = currentPlayer.transform.position;
             Destroy(currentPlayer);
         }
 
@@ -59,5 +55,15 @@ public class CharacterSelector : MonoBehaviour
             cameraFollow.target =
                 currentPlayer.transform;
         }
+    }
+
+    public PlayerMovement GetCurrentPlayerMovement()
+    {
+        if (currentPlayer == null)
+        {
+            return null;
+        }
+
+        return currentPlayer.GetComponent<PlayerMovement>();
     }
 }
