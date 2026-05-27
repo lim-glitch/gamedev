@@ -6,6 +6,42 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
+    path: Assets/Scenes/MainMenu.unity
     guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 0
+    path: Assets/Scenes/MultiplayerLobby.unity
+    guid: 1e9caf5c46421574193734397dd16eae
+  - enabled: 1
+    path: Assets/Scenes/AvatarSelect.unity
+    guid: 952e81ff54eab224bb8cfa026d412115
+  - enabled: 1
+    path: Assets/Scenes/Briefing.unity
+    guid: 4ede4d294da8ab744b14b3e501c55373
+  - enabled: 0
+    path: Assets/Scenes/Level1_xy.unity
+    guid: 67785d0ab5d1ac44093ad265dcc48090
+  - enabled: 0
+    path: Assets/Scenes/Level2_xy.unity
+    guid: e67a9538c123dc0449df1e2e8f2984c6
+  - enabled: 0
+    path: Assets/Scenes/Level3_xy.unity
+    guid: 47ea81ddc9e5c634ca1f2525b8e0bced
+  - enabled: 1
+    path: Assets/Scenes/LevelSelect.unity
+    guid: 6be3799d79b49e74389d3012705bbbd7
+  - enabled: 1
+    path: Assets/Scenes/Result.unity
+    guid: 91bfec3ddd48f3a4e929f44a983f218b
+  - enabled: 1
+    path: Assets/Scenes/Level1/Level1.unity
+    guid: f9b66dbead34bf844883658e7849a70d
+  - enabled: 1
+    path: Assets/Scenes/Level2/Level2.unity
+    guid: ad65cdcf35c784b44b3cbc07b3582364
+  - enabled: 1
+    path: Assets/Scenes/Level3/Level3.unity
+    guid: f0f2ad2cc5a39854aa4ee67d4cc7ce24
+  - enabled: 1
+    path: Assets/Scenes/Storyline.unity
+    guid: d6538eb675c400c46949223e26366d47
   m_configObjects: {}
