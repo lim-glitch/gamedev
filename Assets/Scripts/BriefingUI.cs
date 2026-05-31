@@ -32,20 +32,27 @@ public class BriefingUI : MonoBehaviour
     }
 
     IEnumerator StartCountdown()
+{
+    countdownText.gameObject.SetActive(true);
+
+    if (audioSource != null && countdownSFX != null)
     {
-        countdownText.gameObject.SetActive(true);
-
-        for (int i = 3; i > 0; i--)
-        {
-            countdownText.text = i.ToString();
-            // PLAY SOUND
-            if (audioSource != null && countdownSFX != null)
-            {
-                audioSource.PlayOneShot(countdownSFX);
-            }
-            yield return new WaitForSeconds(1f);
-        }
-
-        SceneManager.LoadScene("Level" + selectedLevel);
+        audioSource.PlayOneShot(countdownSFX);
     }
+
+    countdownText.text = "3";
+    yield return new WaitForSeconds(1f);
+
+    countdownText.text = "2";
+    yield return new WaitForSeconds(1f);
+
+    countdownText.text = "1";
+    yield return new WaitForSeconds(1f);
+
+   
+    yield return new WaitForSeconds(1f);
+
+
+    SceneManager.LoadScene("Level" + selectedLevel);
+   }
 }
